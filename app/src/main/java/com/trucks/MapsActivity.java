@@ -22,6 +22,7 @@ import com.loopj.android.http.RequestParams;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -32,6 +33,7 @@ public class MapsActivity extends FragmentActivity {
 
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static final float TWO_MILES = 3218;
+    private static final String TAG = "Maps Activity";
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private Location mLastKnownLocation;
@@ -73,9 +75,6 @@ public class MapsActivity extends FragmentActivity {
         foodTruckArrayList.add(new FoodTruck("Localmotive", 41.254618, -95.931594));
         foodTruckArrayList.add(new FoodTruck("Island Seasons", 41.257807, -95.973217));
         foodTruckArrayList.add(new FoodTruck("402 BBQ", 41.249416, -96.023061));
-
-
-
         loadMap();
     }
 
@@ -87,16 +86,26 @@ public class MapsActivity extends FragmentActivity {
 
 
         restClient.get("mobileshow.json", params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Toast.makeText(getApplicationContext(), "Buzz Posted!", Toast.LENGTH_LONG).show();
-                System.out.println(response);
-            }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 super.onSuccess(statusCode, headers, response);
+                foodTruckArrayList = new ArrayList<FoodTruck>();
+                for (int i=0; i < response.length(); i++)
+                {
+                    try {
+                        JSONObject truckObject = response.getJSONObject(i);
+                        // Pulling items from the array
+                        String name = truckObject.getString("title");
+                        String copy = truckObject.getString("text");
+                        String latitude = truckObject.getString("latitude");
+                        String longitude = truckObject.getString("longitude");
+                        foodTruckArrayList.add(new FoodTruck(name, Double.parseDouble(latitude), Double.parseDouble(longitude)));
+                    } catch (JSONException e) {
+                        Log.e(TAG, "JSON Exception" + e);
+                    }
+                }
+                loadMap();
             }
 
             @Override
