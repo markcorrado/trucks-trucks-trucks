@@ -1,11 +1,14 @@
 package com.trucks;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,7 +17,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity {
@@ -46,7 +57,8 @@ public class MapsActivity extends FragmentActivity {
                 addFoodTrucksToMap();
             }
             else {
-                getTestFoodTrucks();
+//                getTestFoodTrucks();
+                getRealFoodTrucks();
             }
         }
         else {
@@ -61,7 +73,49 @@ public class MapsActivity extends FragmentActivity {
         foodTruckArrayList.add(new FoodTruck("Localmotive", 41.254618, -95.931594));
         foodTruckArrayList.add(new FoodTruck("Island Seasons", 41.257807, -95.973217));
         foodTruckArrayList.add(new FoodTruck("402 BBQ", 41.249416, -96.023061));
+
+
+
         loadMap();
+    }
+
+    private void getRealFoodTrucks(){
+        TrucksRestClient restClient = TrucksRestClient.getInstance(this, getString(R.string.server));
+        RequestParams params = new RequestParams();
+//        params.add("game_id", Integer.toString(gameId));
+//        params.add("message", message);
+
+
+        restClient.get("mobileshow.json", params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Toast.makeText(getApplicationContext(), "Buzz Posted!", Toast.LENGTH_LONG).show();
+                System.out.println(response);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                super.onSuccess(statusCode, headers, response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                Toast.makeText(getApplicationContext(), "Error posting buzz!", Toast.LENGTH_LONG).show();
+                System.out.println(errorResponse);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
     }
 
     private void addFoodTrucksToMap(){
