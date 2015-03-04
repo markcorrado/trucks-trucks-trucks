@@ -7,7 +7,7 @@ public class FoodTruck {
     private String mName;
     private double mLatitude;
     private double mLongitude;
-    private String mCopy = "This here is some pretty sweet copy.  Just seeing how this looks in a snippet thing.";
+    private String mCopy;
 
     public double getLatitude() {
         return mLatitude;
@@ -25,9 +25,10 @@ public class FoodTruck {
         return mCopy;
     }
 
-    public FoodTruck(String name, double latitude, double longitude) {
+    public FoodTruck(String name, double latitude, double longitude, String copy) {
         mName = name;
         mLatitude = latitude;
         mLongitude = longitude;
+        mCopy = copy;
     }
 }

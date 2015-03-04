@@ -2,12 +2,17 @@ package com.trucks;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.Outline;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -50,6 +55,30 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        ImageButton refreshButton = (ImageButton) findViewById(R.id.refreshButton);
+
+        // Check if we're running on Android 5.0 or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Call some material design APIs here
+            ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    // Or read size directly from the view's width/height
+                    outline.setOval(0, 0, view.getWidth(), view.getHeight());
+                }
+            };
+            refreshButton.setOutlineProvider(viewOutlineProvider);
+            refreshButton.setClipToOutline(true);
+        } else {
+            // Implement features without material design
+        }
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getRealFoodTrucks();
+            }
+        });
         loadMap();
     }
 
@@ -70,20 +99,17 @@ public class MapsActivity extends FragmentActivity {
 
     private void getTestFoodTrucks(){
         foodTruckArrayList = new ArrayList<FoodTruck>();
-        foodTruckArrayList.add(new FoodTruck("Maria Bonita", 41.256698, -95.932180));
-        foodTruckArrayList.add(new FoodTruck("Voo Doo ", 41.284694, -96.006109));
-        foodTruckArrayList.add(new FoodTruck("Localmotive", 41.254618, -95.931594));
-        foodTruckArrayList.add(new FoodTruck("Island Seasons", 41.257807, -95.973217));
-        foodTruckArrayList.add(new FoodTruck("402 BBQ", 41.249416, -96.023061));
+        foodTruckArrayList.add(new FoodTruck("Maria Bonita", 41.256698, -95.932180, "Tacos"));
+        foodTruckArrayList.add(new FoodTruck("Voo Doo ", 41.284694, -96.006109, "Tacos"));
+        foodTruckArrayList.add(new FoodTruck("Localmotive", 41.254618, -95.931594, "Rounders"));
+        foodTruckArrayList.add(new FoodTruck("Island Seasons", 41.257807, -95.973217, "Hawaii"));
+        foodTruckArrayList.add(new FoodTruck("402 BBQ", 41.249416, -96.023061, "BBQ"));
         loadMap();
     }
 
     private void getRealFoodTrucks(){
         TrucksRestClient restClient = TrucksRestClient.getInstance(this, getString(R.string.server));
         RequestParams params = new RequestParams();
-//        params.add("game_id", Integer.toString(gameId));
-//        params.add("message", message);
-
 
         restClient.get("mobileshow.json", params, new JsonHttpResponseHandler() {
 
@@ -100,7 +126,7 @@ public class MapsActivity extends FragmentActivity {
                         String copy = truckObject.getString("text");
                         String latitude = truckObject.getString("latitude");
                         String longitude = truckObject.getString("longitude");
-                        foodTruckArrayList.add(new FoodTruck(name, Double.parseDouble(latitude), Double.parseDouble(longitude)));
+                        foodTruckArrayList.add(new FoodTruck(name, Double.parseDouble(latitude), Double.parseDouble(longitude), copy));
                     } catch (JSONException e) {
                         Log.e(TAG, "JSON Exception" + e);
                     }

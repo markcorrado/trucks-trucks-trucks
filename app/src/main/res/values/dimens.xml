@@ -1,0 +1,19 @@
+<resources>
+<!-- Default screen margins, per the Android Design guidelines. -->
+<dimen name="activity_horizontal_margin">16dp</dimen>
+<dimen name="activity_vertical_margin">16dp</dimen>
+
+<dimen name="toast_padding">12dp</dimen>
+<dimen name="toast_textsize">12sp</dimen>
+
+<dimen name="modal_activity_padding_total">100dp</dimen>
+
+<dimen name="side_drawer_width">400dp</dimen>
+
+<dimen name="item_selector_extra_space_bottom">48dp</dimen>
+
+<!--FAB -->
+    <dimen name="fab_size">80dp</dimen>
+
+
+</resources>
