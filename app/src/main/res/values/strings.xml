@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Trucks</string>
     <string name="title_activity_maps">Map</string>
-    <string name="server">http://10.0.1.140:3000/</string>
+    <string name="server">http://192.168.1.9:3000/</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -84,6 +84,13 @@ public class MapsActivity extends FragmentActivity {
 
     private void loadMap(){
         if(mMap != null) {
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    Toast.makeText(MapsActivity.this, marker.getTitle(), Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
             if(foodTruckArrayList != null) {
                 addFoodTrucksToMap();
             }
@@ -110,8 +117,9 @@ public class MapsActivity extends FragmentActivity {
     private void getRealFoodTrucks(){
         TrucksRestClient restClient = TrucksRestClient.getInstance(this, getString(R.string.server));
         RequestParams params = new RequestParams();
+        Toast.makeText(this, "Finding Foodtrucks...", Toast.LENGTH_SHORT).show();
 
-        restClient.get("mobileshow.json", params, new JsonHttpResponseHandler() {
+        restClient.get("trucksnearme.json", params, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
