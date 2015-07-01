@@ -9,10 +9,13 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,6 +44,9 @@ public class MapsActivity extends FragmentActivity {
     private static final String TAG = "Maps Activity";
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+
     private Location mLastKnownLocation;
     private Marker currentLocationMarker;
     private ArrayList<FoodTruck> foodTruckArrayList;
@@ -49,36 +55,16 @@ public class MapsActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
         setUpMapIfNeeded();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        ImageButton refreshButton = (ImageButton) findViewById(R.id.refreshButton);
-
-        // Check if we're running on Android 5.0 or higher
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Call some material design APIs here
-            ViewOutlineProvider viewOutlineProvider = new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    // Or read size directly from the view's width/height
-                    outline.setOval(0, 0, view.getWidth(), view.getHeight());
-                }
-            };
-            refreshButton.setOutlineProvider(viewOutlineProvider);
-            refreshButton.setClipToOutline(true);
-        } else {
-            // Implement features without material design
-        }
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getRealFoodTrucks();
-            }
-        });
         loadMap();
     }
 
@@ -139,6 +125,7 @@ public class MapsActivity extends FragmentActivity {
                         Log.e(TAG, "JSON Exception" + e);
                     }
                 }
+
                 loadMap();
             }
 
@@ -168,6 +155,7 @@ public class MapsActivity extends FragmentActivity {
                     .snippet(truck.getCopy())
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.pickup)));
         }
+        mDrawerList.setAdapter(new DrawerListAdapter(this, foodTruckArrayList));
     }
 
     /**
